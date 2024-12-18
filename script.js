@@ -388,9 +388,14 @@ function renderSubscriptionGrid(filter = '') {
     if (subscriptionGrid.children.length === 0) {
         const noResults = document.createElement('div');
         noResults.className = 'no-results';
-        noResults.textContent = filter ? 
-            'No matching subscriptions found.' : 
-            'No available subscriptions to add.';
+        noResults.innerHTML = `
+            <i class="fas fa-search"></i>
+            <h3>${filter ? 'No matching subscriptions found' : 'No available subscriptions'}</h3>
+            <p>${filter ? 
+                'Try adjusting your search terms or browse all available services.' : 
+                'All available subscription services have been added to your list.'}
+            </p>
+        `;
         subscriptionGrid.appendChild(noResults);
     }
 }
@@ -634,6 +639,33 @@ function updateSubscriptionList() {
     });
     
     filteredSubscriptions.forEach(sub => {
+        // Calculate duration
+        const startDate = new Date(sub.startDate);
+        const currentDate = new Date();
+        const monthsDiff = (currentDate.getFullYear() - startDate.getFullYear()) * 12 + 
+                          (currentDate.getMonth() - startDate.getMonth());
+        
+        // Calculate years and remaining months
+        const years = Math.floor(monthsDiff / 12);
+        const months = monthsDiff % 12;
+        
+        // Create duration text
+        let durationText = '';
+        if (years > 0) {
+            durationText += `${years} ${years === 1 ? 'year' : 'years'}`;
+            if (months > 0) {
+                durationText += ` and ${months} ${months === 1 ? 'month' : 'months'}`;
+            }
+        } else if (months > 0) {
+            durationText += `${months} ${months === 1 ? 'month' : 'months'}`;
+        } else {
+            durationText = 'Less than a month';
+        }
+        
+        // Calculate total amount paid based on billing cycle
+        const monthlyAmount = sub.billingCycle === 'yearly' ? sub.cost / 12 : sub.cost;
+        const totalPaid = monthlyAmount * monthsDiff;
+        
         const item = document.createElement('div');
         item.className = 'subscription-item';
         item.innerHTML = `
@@ -642,7 +674,11 @@ function updateSubscriptionList() {
                 <div class="subscription-details">
                     <h3>${sub.service}</h3>
                     <p><i class="fas fa-dollar-sign"></i> $${sub.cost} / ${sub.billingCycle}</p>
-                    <p><i class="fas fa-calendar-check"></i> Started: ${new Date(sub.startDate).toLocaleDateString()}</p>
+                    <div class="subscription-dates">
+                        <p><i class="fas fa-calendar-check"></i> Started: ${new Date(sub.startDate).toLocaleDateString()}</p>
+                        <p class="duration"><i class="fas fa-clock"></i> Duration: ${durationText}</p>
+                        <p class="total-paid"><i class="fas fa-receipt"></i> Total paid: $${totalPaid.toFixed(2)}</p>
+                    </div>
                     ${formatNextPaymentMessage(sub)}
                 </div>
             </div>
@@ -674,7 +710,14 @@ function updateSubscriptionList() {
     if (filteredSubscriptions.length === 0) {
         const noSubs = document.createElement('div');
         noSubs.className = 'no-results';
-        noSubs.textContent = 'No subscriptions found.';
+        noSubs.innerHTML = `
+            <i class="fas fa-inbox"></i>
+            <h3>No subscriptions found</h3>
+            <p>${currentFilter === 'all' ? 
+                'Click the "New Subscription" button to start tracking your subscriptions.' : 
+                `No ${currentFilter} subscriptions to display.`}
+            </p>
+        `;
         subscriptionList.appendChild(noSubs);
     }
 }
