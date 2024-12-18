@@ -662,9 +662,15 @@ function updateSubscriptionList() {
             durationText = 'Less than a month';
         }
         
-        // Calculate total amount paid based on billing cycle
-        const monthlyAmount = sub.billingCycle === 'yearly' ? sub.cost / 12 : sub.cost;
-        const totalPaid = monthlyAmount * monthsDiff;
+        // Calculate total amount paid
+        let totalPaid;
+        if (sub.billingCycle === 'yearly') {
+            // For yearly subscriptions, calculate completed years plus initial payment
+            totalPaid = (years + 1) * sub.cost;
+        } else {
+            // For monthly subscriptions
+            totalPaid = sub.cost * (monthsDiff + 1);
+        }
         
         const item = document.createElement('div');
         item.className = 'subscription-item';
@@ -675,7 +681,7 @@ function updateSubscriptionList() {
                     <h3>${sub.service}</h3>
                     <p><i class="fas fa-dollar-sign"></i> $${sub.cost} / ${sub.billingCycle}</p>
                     <div class="subscription-dates">
-                        <p><i class="fas fa-calendar-check"></i> Started: ${new Date(sub.startDate).toLocaleDateString()}</p>
+                        <p><i class="fas fa-calendar-check"></i> Started: ${formatStartDate(sub.startDate)}</p>
                         <p class="duration"><i class="fas fa-clock"></i> Duration: ${durationText}</p>
                         <p class="total-paid"><i class="fas fa-receipt"></i> Total paid: $${totalPaid.toFixed(2)}</p>
                     </div>
@@ -683,7 +689,10 @@ function updateSubscriptionList() {
                 </div>
             </div>
             <div class="subscription-actions">
-                <span class="subscription-status status-${sub.status}">${sub.status}</span>
+                <span class="subscription-status status-${sub.status}">
+                    <i class="fas ${sub.status === 'active' ? 'fa-check-circle' : 'fa-pause-circle'}"></i>
+                    ${sub.status}
+                </span>
                 <div class="dropdown">
                     <button class="dropdown-toggle" title="More actions" onclick="toggleDropdown(event, ${sub.id})">
                         <i class="fas fa-ellipsis-h"></i>
@@ -916,4 +925,33 @@ function setupScrollEffect() {
 function handleImageError(img) {
     img.onerror = null; // Prevent infinite loop
     img.src = './favicon/favicon.svg'; // Path to your default fallback image
+}
+
+// Add this helper function for formatting dates
+function formatStartDate(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = now - date;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+    // If it's today
+    if (diffDays === 0) {
+        return 'Today';
+    }
+    // If it's yesterday
+    if (diffDays === 1) {
+        return 'Yesterday';
+    }
+    // If it's within the last 7 days
+    if (diffDays < 7) {
+        return `${diffDays} days ago`;
+    }
+
+    // Format the date
+    const options = { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    };
+    return date.toLocaleDateString('en-US', options);
 } 

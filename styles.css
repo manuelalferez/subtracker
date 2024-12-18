@@ -203,6 +203,9 @@ button:hover {
     font-size: 0.8rem;
     font-weight: 500;
     text-transform: capitalize;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .status-active {
@@ -210,9 +213,22 @@ button:hover {
     color: #0f783c;
 }
 
+.status-active i {
+    color: #0f783c;
+}
+
 .status-inactive {
     background-color: #fee2e2;
     color: #991b1b;
+}
+
+.status-inactive i {
+    color: #991b1b;
+}
+
+/* Optional: Add hover effect */
+.subscription-status:hover {
+    filter: brightness(0.95);
 }
 
 /* Modal styles */
