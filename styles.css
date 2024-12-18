@@ -1145,3 +1145,90 @@ button:hover {
     margin: 5px 0;
     color: #666;
 }
+
+/* Update subscription item styles for better responsiveness */
+.subscription-item {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .subscription-item {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.75rem;
+    }
+}
+
+.subscription-info {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .subscription-info {
+        flex-direction: row;
+        align-items: center;
+        gap: 2rem;
+        width: auto;
+    }
+}
+
+.subscription-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+@media (min-width: 768px) {
+    .subscription-actions {
+        width: auto;
+        padding-top: 0;
+        border-top: none;
+        gap: 1rem;
+    }
+}
+
+/* Update subscription details for mobile */
+.subscription-details {
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .subscription-details {
+        width: auto;
+    }
+}
+
+/* Make the logo responsive */
+.subscription-logo {
+    width: 40px;
+    height: 40px;
+}
+
+@media (min-width: 768px) {
+    .subscription-logo {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+/* Adjust status badge for mobile */
+.subscription-status {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.75rem;
+}
+
+@media (min-width: 768px) {
+    .subscription-status {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+    }
+}
