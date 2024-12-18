@@ -23,6 +23,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
+    min-height: calc(100vh - 140px); /* Account for header and footer */
 }
 
 header {
@@ -65,15 +66,81 @@ button:hover {
 .subscription-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
 }
 
 .stat-card {
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: white;
+    padding: 1.75rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), #34d399);
+    opacity: 0.8;
+}
+
+.stat-card h3 {
+    color: #666;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stat-card h3 i {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+}
+
+.stat-card p {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0;
+}
+
+/* Add specific styles for each card */
+.stat-card.monthly h3 i {
+    color: #3b82f6;
+}
+
+.stat-card.monthly::before {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.stat-card.yearly h3 i {
+    color: #8b5cf6;
+}
+
+.stat-card.yearly::before {
+    background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+}
+
+.stat-card.active h3 i {
+    color: #10b981;
+}
+
+.stat-card.active::before {
+    background: linear-gradient(90deg, #10b981, #34d399);
 }
 
 .subscription-list {
@@ -159,6 +226,7 @@ button:hover {
     background-color: rgba(0, 0, 0, 0.5);
     overflow-y: auto;
     padding: 20px;
+    z-index: 9999;
 }
 
 .modal-content {
@@ -170,6 +238,7 @@ button:hover {
     position: relative;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     animation: modalSlideIn 0.3s ease-out;
+    z-index: 10000;
 }
 
 .subscription-picker {
@@ -520,3 +589,479 @@ button:hover {
         transform: translateY(0);
     }
 } 
+
+/* Header Styles */
+.site-header {
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    padding: 1.2rem 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.header-content {
+    width: 100%;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+/* Logo Styles */
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin: 0 auto;
+}
+
+.logo-icon {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.logo-circle {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary-color), #34d399);
+    border-radius: 12px;
+    transform: rotate(-10deg);
+    transition: transform 0.3s ease;
+}
+
+.logo:hover .logo-circle {
+    transform: rotate(0deg);
+}
+
+.logo-dollar {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-color);
+    letter-spacing: -0.5px;
+    text-align: center;
+    margin: 0 auto;
+}
+
+/* Footer Styles */
+.site-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid var(--border-color);
+    padding: 2rem 0;
+    margin-top: 4rem;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+}
+
+.footer-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.footer-logo .logo-icon {
+    width: 32px;
+    height: 32px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer-logo .logo-circle {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary-color), #34d399);
+    border-radius: 8px;
+    transform: rotate(-10deg);
+    transition: transform 0.3s ease;
+}
+
+.footer-logo .logo-dollar {
+    position: relative;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    z-index: 1;
+}
+
+.footer-logo span {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.footer-tagline {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.social-links {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.social-links a {
+    color: #666;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    padding: 0.6rem;
+    border-radius: 8px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    width: 36px;
+    height: 36px;
+    text-decoration: none;
+}
+
+/* Add these hover effects */
+.social-links a:hover {
+    background-color: var(--hover-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.social-links a:hover .fa-x-twitter {
+    color: #000;
+}
+
+.social-links a:hover .fa-link {
+    color: var(--primary-color);
+}
+
+.footer-credit {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+/* Update responsive Footer styles */
+@media (max-width: 768px) {
+    .site-footer {
+        padding: 2rem 1rem;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 1.5rem;
+    }
+
+    .footer-section {
+        width: 100%;
+        align-items: center;
+    }
+
+    .footer-tagline {
+        margin-bottom: 1rem;
+    }
+
+    .social-links {
+        justify-content: center;
+        margin-bottom: 0.75rem;
+    }
+} 
+
+/* Update welcome state styles for responsiveness */
+.welcome-state {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    padding: 2rem;
+}
+
+.welcome-content {
+    max-width: 900px;
+    text-align: center;
+    width: 100%;
+    padding: 0 1rem;
+}
+
+.welcome-header {
+    margin-bottom: 4rem;
+}
+
+.welcome-header h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+    line-height: 1.2;
+    background: linear-gradient(135deg, var(--primary-color), #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.welcome-header p {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: #666;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+    padding: 0 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .welcome-state {
+        min-height: auto;
+        padding: 3rem 1rem;
+    }
+
+    .welcome-header {
+        margin-bottom: 3rem;
+    }
+
+    .features {
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .feature-item {
+        padding: 1.5rem;
+    }
+
+    .feature-item i {
+        font-size: 1.75rem;
+    }
+
+    .feature-item h3 {
+        font-size: 1.1rem;
+    }
+
+    .feature-item p {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-state {
+        padding: 2rem 1rem;
+    }
+
+    .welcome-header {
+        margin-bottom: 2rem;
+    }
+
+    .features {
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .feature-item {
+        padding: 1.25rem;
+    }
+
+    .welcome-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+.feature-item {
+    padding: 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+}
+
+.feature-item:hover {
+    transform: translateY(-5px);
+}
+
+.feature-item i {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.feature-item h3 {
+    font-size: 1.25rem;
+    color: var(--text-color);
+    margin-bottom: 0.75rem;
+}
+
+.feature-item p {
+    color: #666;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* ... existing styles ... */
+}
+
+.get-started-btn {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
+}
+
+.get-started-btn:hover {
+    background-color: var(--primary-color-dark);
+    transform: translateY(-2px);
+}
+
+.get-started-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(46, 204, 113, 0.2);
+}
+
+.get-started-btn i {
+    font-size: 1.2em;
+}
+
+/* Make it responsive */
+@media (max-width: 768px) {
+    .get-started-btn {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+    }
+}
+
+.welcome-button {
+    background: linear-gradient(135deg, var(--primary-color), #34d399);
+    color: white;
+    padding: 1rem 2rem;
+    border: none;
+    border-radius: 50px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+    position: relative;
+    overflow: hidden;
+    margin: 0 auto;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.welcome-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+}
+
+.welcome-button:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+}
+
+.welcome-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+    );
+    transition: 0.5s;
+}
+
+.welcome-button:hover::before {
+    left: 100%;
+}
+
+.welcome-button i {
+    font-size: 1.2rem;
+}
+
+/* Add responsive styles for the welcome button */
+@media (max-width: 768px) {
+    .welcome-button {
+        padding: 0.875rem 1.75rem;
+        font-size: 1rem;
+    }
+}
+
+/* Add these styles for the header scroll effect */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.site-header.scrolled {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    background-color: rgba(255, 255, 255);
+}
+
+/* Add these styles for the new fields */
+.subscription-item p {
+    margin: 5px 0;
+    color: #666;
+}

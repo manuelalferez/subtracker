@@ -3,15 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscription Tracker</title>
+    <title>SubTracker</title>
+    
+    <link
+    rel="icon"
+    type="image/png"
+    href="./favicon/favicon-96x96.png"
+    sizes="96x96"
+  />
+  <link rel="icon" type="image/svg+xml" href="./favicon/favicon.svg" />
+  <link rel="shortcut icon" href="./favicon/favicon.ico" />
+  <link
+    rel="apple-touch-icon"
+    sizes="180x180"
+    href="./favicon/apple-touch-icon.png"
+  />
+  <link rel="manifest" href="./favicon/site.webmanifest" />
+  
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="styles.css">
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <header class="site-header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">
+                    <div class="logo-circle"></div>
+                    <div class="logo-dollar">$</div>
+                </div>
+                <span class="logo-text">SubTracker</span>
+            </div>
+        </div>
+    </header>
+
     <div class="container">
         <header>
-            <h1><i class="fas fa-receipt"></i> Subscription Tracker</h1>
             <div class="add-subscription">
                 <button id="addNewBtn"><i class="fas fa-plus"></i> New Subscription</button>
             </div>
@@ -19,16 +47,16 @@
 
         <main>
             <div class="subscription-stats">
-                <div class="stat-card">
-                    <h3>Total Monthly</h3>
+                <div class="stat-card monthly">
+                    <h3><i class="fas fa-wallet"></i> Total Monthly</h3>
                     <p id="totalMonthly">$0.00</p>
                 </div>
-                <div class="stat-card">
-                    <h3>Total Yearly</h3>
+                <div class="stat-card yearly">
+                    <h3><i class="fas fa-chart-line"></i> Total Yearly</h3>
                     <p id="totalYearly">$0.00</p>
                 </div>
-                <div class="stat-card">
-                    <h3>Active Subscriptions</h3>
+                <div class="stat-card active">
+                    <h3><i class="fas fa-check-circle"></i> Active Subscriptions</h3>
                     <p id="activeCount">0</p>
                 </div>
             </div>
@@ -145,5 +173,31 @@
     </div>
 
     <script src="script.js"></script>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-logo">
+                    <div class="logo-icon">
+                        <div class="logo-circle"></div>
+                        <div class="logo-dollar">$</div>
+                    </div>
+                    <span>SubTracker</span>
+                </div>
+                <p class="footer-tagline">Manage your subscriptions smarter</p>
+            </div>
+            <div class="footer-section">
+                <div class="social-links">
+                    <a href="https://twitter.com/manuelalferez" target="_blank" title="X (Twitter)">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </a>
+                    <a href="https://manuelalferez.com" target="_blank" title="Portfolio">
+                        <i class="fas fa-link"></i>
+                    </a>
+                </div>
+                <p class="footer-credit">Created by Manuel Alférez</p>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>

@@ -30,7 +30,7 @@ const commonServices = {
     'CuriosityStream': 'https://logo.clearbit.com/curiositystream.com',
     'Nebula': 'https://logo.clearbit.com/nebula.app',
     'Criterion Channel': 'https://logo.clearbit.com/criterionchannel.com',
-    'Showtime': 'https://logo.clearbit.com/showtime.com',
+    'Showtime': 'https://www.sho.com/assets/images/favicon/apple-touch-icon.png',
     'Starz': 'https://logo.clearbit.com/starz.com',
     'AMC+': 'https://logo.clearbit.com/amcplus.com',
     'Vudu': 'https://logo.clearbit.com/vudu.com',
@@ -100,7 +100,7 @@ const commonServices = {
     'Wave Pro': 'https://logo.clearbit.com/waveapps.com',
     'Xero': 'https://logo.clearbit.com/xero.com',
     'WebFlow': 'https://logo.clearbit.com/webflow.com',
-    'Figma': 'https://logo.clearbit.com/figma.com',
+    'Figma': 'https://static.figma.com/app/icon/1/favicon.svg',
     'InVision': 'https://logo.clearbit.com/invisionapp.com',
 
     // Security & VPN
@@ -192,7 +192,7 @@ const commonServices = {
     'Freeletics': 'https://logo.clearbit.com/freeletics.com',
     'Fitbod': 'https://logo.clearbit.com/fitbod.me',
     'Strong': 'https://logo.clearbit.com/strong.app',
-    'Stacked': 'https://logo.clearbit.com/stacked.app'
+    'Stacked': 'https://play-lh.googleusercontent.com/TwCOoU_tqgvXKqupgQ8VYl3B5Cxvsubstitute_stacked_logo_here'
 };
 
 // IndexedDB setup
@@ -375,7 +375,7 @@ function renderSubscriptionGrid(filter = '') {
                 const option = document.createElement('div');
                 option.className = 'subscription-option';
                 option.innerHTML = `
-                    <img src="${logo}" alt="${name}" onerror="this.src='default-logo.png'">
+                    <img src="${logo}" alt="${name}" onerror="handleImageError(this)">
                     <span>${name}</span>
                 `;
                 option.onclick = () => selectSubscription(name);
@@ -452,29 +452,40 @@ subscriptionForm.addEventListener('submit', async (e) => {
 // Add this at the top with other variables
 let currentFilter = 'all';
 
-// Add this function to calculate next payment date
+// Update the getNextPaymentDate function
 function getNextPaymentDate(subscription) {
     if (subscription.status !== 'active') return null;
     
     const startDate = new Date(subscription.startDate);
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Create next payment date starting from the start date
+    let nextDate = new Date(startDate);
+    nextDate.setHours(0, 0, 0, 0);
     
     if (subscription.billingCycle === 'monthly') {
-        let nextDate = new Date(startDate);
+        // Simply add one month to the start date
+        nextDate.setMonth(startDate.getMonth() + 1);
+        
+        // Keep adding months until we find a date after today
         while (nextDate <= today) {
             nextDate.setMonth(nextDate.getMonth() + 1);
         }
-        return nextDate;
     } else { // yearly
-        let nextDate = new Date(startDate);
+        // Simply add one year to the start date
+        nextDate.setFullYear(startDate.getFullYear() + 1);
+        
+        // Keep adding years until we find a date after today
         while (nextDate <= today) {
             nextDate.setFullYear(nextDate.getFullYear() + 1);
         }
-        return nextDate;
     }
+    
+    return nextDate;
 }
 
-// Add this function to format the next payment message
+// Update the formatNextPaymentMessage function
 function formatNextPaymentMessage(subscription) {
     if (subscription.status !== 'active') return '';
     
@@ -482,27 +493,94 @@ function formatNextPaymentMessage(subscription) {
     if (!nextPayment) return '';
     
     const today = new Date();
-    const daysUntilPayment = Math.ceil((nextPayment - today) / (1000 * 60 * 60 * 24));
+    today.setHours(0, 0, 0, 0);
+    
+    // Calculate days until payment, accounting for timezone differences
+    const nextPaymentTime = nextPayment.getTime();
+    const todayTime = today.getTime();
+    const daysUntilPayment = Math.ceil((nextPaymentTime - todayTime) / (1000 * 60 * 60 * 24));
     
     let className = 'next-payment';
     if (daysUntilPayment <= 7) className += ' upcoming';
     if (daysUntilPayment <= 0) className += ' overdue';
     
+    // Format date string in user's locale
     const dateStr = nextPayment.toLocaleDateString('en-US', { 
         month: 'long', 
         day: 'numeric', 
-        year: 'numeric' 
+        year: 'numeric',
+        timeZone: 'UTC' // Ensure consistent timezone handling
     });
     
     let message = `Next payment: ${dateStr}`;
     if (daysUntilPayment <= 7 && daysUntilPayment > 0) {
         message += ` (in ${daysUntilPayment} days)`;
     } else if (daysUntilPayment <= 0) {
-        message += ' (overdue)';
+        const overdueDays = Math.abs(daysUntilPayment);
+        message += ` (${overdueDays} ${overdueDays === 1 ? 'day' : 'days'} overdue)`;
     }
     
     return `<div class="${className}"><i class="fas fa-calendar-alt"></i> ${message}</div>`;
 }
+
+// Update the toggleStatus function to handle next payment date
+async function toggleStatus(id) {
+    const subscription = subscriptions.find(sub => sub.id === id);
+    const newStatus = subscription.status === 'active' ? 'inactive' : 'active';
+    
+    // If reactivating, update the start date to today
+    if (newStatus === 'active') {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        subscription.startDate = `${year}-${month}-${day}`;
+    }
+    
+    subscription.status = newStatus;
+    
+    try {
+        await updateSubscriptionInDB(subscription);
+        updateSubscriptionList();
+        updateStats();
+        renderSubscriptionGrid(searchInput.value);
+    } catch (error) {
+        console.error('Error updating subscription:', error);
+        alert('Failed to update subscription status. Please try again.');
+    }
+}
+
+// Update the editSubscriptionForm submit handler
+editSubscriptionForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const id = parseInt(document.getElementById('editSubscriptionId').value);
+    const subscription = subscriptions.find(sub => sub.id === id);
+    
+    const newStartDate = document.getElementById('editStartDate').value;
+    const startDate = new Date(newStartDate);
+    startDate.setHours(0, 0, 0, 0);
+    
+    const updatedSubscription = {
+        ...subscription,
+        cost: parseFloat(document.getElementById('editCost').value),
+        billingCycle: document.getElementById('editBillingCycle').value,
+        startDate: newStartDate
+    };
+
+    try {
+        await updateSubscriptionInDB(updatedSubscription);
+        const index = subscriptions.findIndex(sub => sub.id === id);
+        subscriptions[index] = updatedSubscription;
+        updateSubscriptionList();
+        updateStats();
+        editSubscriptionModal.style.display = 'none';
+    } catch (error) {
+        console.error('Error updating subscription:', error);
+        alert('Failed to update subscription. Please try again.');
+    }
+});
 
 // Update the setupDropdowns function to include modal close buttons
 function setupDropdowns() {
@@ -531,9 +609,24 @@ function setupDropdowns() {
     });
 }
 
-// Update the updateSubscriptionList function to improve the dropdown button UI
+// Add this function to check if it's a new user
+function isNewUser() {
+    return subscriptions.length === 0;
+}
+
+// Update the updateSubscriptionList function
 function updateSubscriptionList() {
     subscriptionList.innerHTML = '';
+    const addSubscriptionButton = document.querySelector('.add-subscription');
+    
+    if (isNewUser()) {
+        renderWelcomeState();
+        addSubscriptionButton.style.display = 'none';
+        return;
+    }
+    
+    // Show the button when there are subscriptions
+    addSubscriptionButton.style.display = 'flex';
     
     const filteredSubscriptions = subscriptions.filter(sub => {
         if (currentFilter === 'all') return true;
@@ -545,7 +638,7 @@ function updateSubscriptionList() {
         item.className = 'subscription-item';
         item.innerHTML = `
             <div class="subscription-info">
-                <img src="${sub.logo}" alt="${sub.service}" class="subscription-logo">
+                <img src="${sub.logo}" alt="${sub.service}" class="subscription-logo" onerror="handleImageError(this)">
                 <div class="subscription-details">
                     <h3>${sub.service}</h3>
                     <p><i class="fas fa-dollar-sign"></i> $${sub.cost} / ${sub.billingCycle}</p>
@@ -586,6 +679,51 @@ function updateSubscriptionList() {
     }
 }
 
+// Update the renderWelcomeState function
+function renderWelcomeState() {
+    // Hide the "New Subscription" button
+    document.querySelector('.add-subscription').style.display = 'none';
+    
+    const welcomeState = document.createElement('div');
+    welcomeState.className = 'welcome-state';
+    welcomeState.innerHTML = `
+        <div class="welcome-content">
+            <div class="welcome-header">
+                <h1>Welcome to SubTracker</h1>
+                <p>The easiest way to manage all your subscriptions in one place</p>
+            </div>
+            
+            <div class="features">
+                <div class="feature-item">
+                    <i class="fas fa-calculator"></i>
+                    <h3>Track Your Spending</h3>
+                    <p>Monitor your monthly and yearly subscription costs</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-clock"></i>
+                    <h3>Payment Reminders</h3>
+                    <p>Never miss a payment with renewal date tracking</p>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-chart-pie"></i>
+                    <h3>Smart Analytics</h3>
+                    <p>Get insights into your subscription expenses</p>
+                </div>
+            </div>
+
+            <button onclick="document.getElementById('addNewBtn').click()" class="welcome-button">
+                <i class="fas fa-rocket"></i> Get Started
+            </button>
+        </div>
+    `;
+    
+    subscriptionList.appendChild(welcomeState);
+    
+    // Hide the filters and stats when showing welcome state
+    document.querySelector('.subscription-filters').style.display = 'none';
+    document.querySelector('.subscription-stats').style.display = 'none';
+}
+
 // Add this function to toggle the dropdown menu
 function toggleDropdown(event, id) {
     event.stopPropagation();
@@ -597,33 +735,6 @@ function toggleDropdown(event, id) {
     });
     const dropdown = document.getElementById(`dropdown-${id}`);
     dropdown.classList.toggle('show');
-}
-
-// Toggle subscription status
-async function toggleStatus(id) {
-    const subscription = subscriptions.find(sub => sub.id === id);
-    const newStatus = subscription.status === 'active' ? 'inactive' : 'active';
-    
-    // If reactivating, update the start date to today
-    if (newStatus === 'active') {
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        subscription.startDate = `${year}-${month}-${day}`;
-    }
-    
-    subscription.status = newStatus;
-    
-    try {
-        await updateSubscriptionInDB(subscription);
-        updateSubscriptionList();
-        updateStats();
-        renderSubscriptionGrid(searchInput.value);
-    } catch (error) {
-        console.error('Error updating subscription:', error);
-        alert('Failed to update subscription status. Please try again.');
-    }
 }
 
 // Delete subscription
@@ -642,6 +753,18 @@ async function deleteSubscription(id) {
 
 // Update statistics
 function updateStats() {
+    const statsSection = document.querySelector('.subscription-stats');
+    const filtersSection = document.querySelector('.subscription-filters');
+    
+    if (isNewUser()) {
+        statsSection.style.display = 'none';
+        filtersSection.style.display = 'none';
+        return;
+    }
+    
+    statsSection.style.display = 'grid';
+    filtersSection.style.display = 'flex';
+    
     const activeSubscriptions = subscriptions.filter(sub => sub.status === 'active');
     
     const monthlyTotal = activeSubscriptions.reduce((total, sub) => {
@@ -661,6 +784,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await initDB();
         renderSubscriptionGrid();
         setupDropdowns();
+        setupScrollEffect();
         
         const filterButtons = document.querySelectorAll('.filter-button');
         filterButtons.forEach(button => {
@@ -731,29 +855,22 @@ function openEditModal(id) {
     editSubscriptionModal.style.display = 'block';
 }
 
-// Add edit form submission handler
-editSubscriptionForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
+// Add this new function for header scroll effect
+function setupScrollEffect() {
+    const navbar = document.querySelector('.site-header');
+    if (!navbar) return; // Guard clause in case element isn't found
     
-    const id = parseInt(document.getElementById('editSubscriptionId').value);
-    const subscription = subscriptions.find(sub => sub.id === id);
-    
-    const updatedSubscription = {
-        ...subscription,
-        cost: parseFloat(document.getElementById('editCost').value),
-        billingCycle: document.getElementById('editBillingCycle').value,
-        startDate: document.getElementById('editStartDate').value
-    };
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 10) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+}
 
-    try {
-        await updateSubscriptionInDB(updatedSubscription);
-        const index = subscriptions.findIndex(sub => sub.id === id);
-        subscriptions[index] = updatedSubscription;
-        updateSubscriptionList();
-        updateStats();
-        editSubscriptionModal.style.display = 'none';
-    } catch (error) {
-        console.error('Error updating subscription:', error);
-        alert('Failed to update subscription. Please try again.');
-    }
-}); 
+// Add this function to handle image loading errors
+function handleImageError(img) {
+    img.onerror = null; // Prevent infinite loop
+    img.src = './favicon/favicon.svg'; // Path to your default fallback image
+} 
